@@ -6,22 +6,24 @@ const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcrypt');
 
+
+require('dotenv').config();
+
 const app = express();
 
-app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(cors({
-    origin: '*'
+    origin:process.env.FRONTEND_URL || 'http://localhost:5500'
 }));
 
-
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '12porcarias*',
-    database: 'perfildeusuario'
-})
+    host: process.env.MYSQL_HOST, 
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_DATABASE, 
+    port: process.env.MYSQL_PORT 
+});
 
 db.connect(err => {
     if (err) {
@@ -29,7 +31,8 @@ db.connect(err => {
         return;
     }
     console.log('Conectado ao MySQL com o ID:', db.threadId);
-    });
+});
+
 
     const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -159,18 +162,12 @@ app.put('/usuarios/:id', upload.single('foto_perfil_file'), (req, res) => {
         const updateFields = [];
         const updateValues = [];
 
-        updateFields.push('nome_completo = ?');
-        updateValues.push(nome_completo);
-        updateFields.push('idade = ?');
-        updateValues.push(idade);
-        updateFields.push('rua = ?');
-        updateValues.push(rua);
-        updateFields.push('bairro = ?');
-        updateValues.push(bairro);
-        updateFields.push('estado = ?');
-        updateValues.push(estado);
-        updateFields.push('biografia = ?');
-        updateValues.push(biografia);
+        if (nome_completo !== undefined) { updateFields.push('nome_completo = ?'); updateValues.push(nome_completo); }
+        if (idade !== undefined) { updateFields.push('idade = ?'); updateValues.push(idade); }
+        if (rua !== undefined) { updateFields.push('rua = ?'); updateValues.push(rua); }
+        if (bairro !== undefined) { updateFields.push('bairro = ?'); updateValues.push(bairro); }
+        if (estado !== undefined) { updateFields.push('estado = ?'); updateValues.push(estado); }
+        if (biografia !== undefined) { updateFields.push('biografia = ?'); updateValues.push(biografia); }
 
         updateFields.push('foto_perfil = ?');
         updateValues.push(foto_para_salvar_no_db);
@@ -202,9 +199,9 @@ app.put('/usuarios/:id', upload.single('foto_perfil_file'), (req, res) => {
 
             res.status(200).json({
                 message: 'Usuário atualizado com sucesso!',
-                foto_url: foto_para_salvar_no_db ? `http://localhost:3000${foto_para_salvar_no_db}` : null
-            });
+                foto_url: foto_para_salvar_no_db ? `${process.env.BACKEND_URL || 'http://localhost:3000'}${foto_para_salvar_no_db}` : null
         });
+    });
     };
 
     if (req.file) {
@@ -284,6 +281,7 @@ app.delete('/usuarios/:id', (req, res) => {
 });
 
 
-app.listen(3000, () => {
-    console.log('Servidor Node.js rodando em http://localhost:3000');
+const PORT = process.env.PORT || 3000; 
+app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
