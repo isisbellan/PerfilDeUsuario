@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/style.css" media="screen">
+    <title>Meu Perfil</title>
+</head>
+<body>
+
+    <div class="profile-container">
+    <h1 id="subtitulo2" >Meu perfil</h1>
+    <img id="foto_perfil_file" src="https://via.placeholder.com/150" alt="Foto de Perfil" class="fotoperfil">
+
+        <div class="profile-info">
+            <p><h3 id="subtitulo2">Nome Completo:</h3> <span id="nomeCompleto"></span></p>
+            <p><h3 id="subtitulo2">Idade:</h3> <span id="idade"></span></p>
+            <p><h3 id="subtitulo2">Endereço:</h3> <span id="endereco"></span></p>
+            <p><h3 id="subtitulo2">Estado:</h3> <span id="estado"></span></p>
+            <p><h3 id="subtitulo2">Biografia:</h3> <span id="biografia"></span></p>
+        </div>
+
+    <div id="espacobotoes">
+    <a id="editarhtml" href="editar.html">Editar dados de usuário</a>
+    <a id="deletarhtml" href="deletar.html">Apagar conta de usuário</a>
+    </div>
+    
+    <a href="#" id="botaoLogOut">Log out</a>
+
+    <div id="mensagem_perfil"></div>
+
+ </div>
+
+
+
+<script>
+         const profileImage = document.getElementById('foto_perfil_file');
+        const nomeCompletoSpan = document.getElementById('nomeCompleto');
+        const idadeSpan = document.getElementById('idade');
+        const enderecoSpan = document.getElementById('endereco');
+        const estadoSpan = document.getElementById('estado');
+        const biografiaSpan = document.getElementById('biografia');
+        const mensagemDivPerfil = document.getElementById('mensagem_perfil');
+        const editarhtml = document.getElementById('editarhtml');
+        const deletarhtml = document.getElementById('deletarhtml');
+        const botaoLogOut = document.getElementById('botaoLogOut');
+
+
+        async function carregarDadosDoPerfil(userId) {
+            try {
+                const response = await fetch(`http://localhost:3000/usuarios/${userId}`);
+                const userData = await response.json();
+
+                if (response.ok) {
+                    nomeCompletoSpan.textContent = userData.nome_completo;
+                    idadeSpan.textContent = userData.idade;
+                    enderecoSpan.textContent = `${userData.rua}, ${userData.bairro}`;
+                    estadoSpan.textContent = userData.estado;
+                    biografiaSpan.textContent = userData.biografia || 'Nenhuma biografia informada.';
+
+                    if (userData.foto_perfil) {
+                        profileImage.src = `http://localhost:3000${userData.foto_perfil}`;
+                    } else {
+                        profileImage.src = 'https://via.placeholder.com/150';
+                    }
+
+                    editarhtml.href = `editar.html?id=${userId}`;
+                    deletarhtml.href = `deletar.html?id=${userId}`;
+
+                } else {
+                    mensagemDivPerfil.textContent = `Erro ao carregar perfil: ${userData.message || 'Desconhecido'}`;
+                    mensagemDivPerfil.style.color = 'red';
+                }
+            } catch (error) {
+                console.error('Erro de rede ao carregar perfil:', error);
+                mensagemDivPerfil.textContent = 'Não foi possível carregar os dados do perfil. Verifique a conexão com o servidor.';
+                mensagemDivPerfil.style.color = 'red';
+            }
+        }
+
+        const userId = localStorage.getItem('usuarioId');
+
+        if (userId) {
+            carregarDadosDoPerfil(userId);
+        } else {
+            alert('Você não está logado.');
+            window.location.href = 'login.html'; 
+        }
+
+        botaoLogOut.addEventListener('click', function(event) {
+            event.preventDefault();
+            localStorage.removeItem('usuarioId');
+            alert('Você foi desconectado.');
+            window.location.href = 'login.html';
+        });
+    </script>
+
+
+
+</body>
+</html>

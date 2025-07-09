@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/style.css" media="screen" >
+    <title>Apagar dados do usuário</title>
+</head>
+<body>
+    <header>
+    <h1 id="titulo">Apagar perfil de usuário</h1>
+     </header>
+
+     <input type="hidden" id="userIdToDelete" name="id">
+
+     <button id="botaoDeletar">Excluir minha conta</button><br>
+     <a href="perfil.html">Voltar</a>
+
+     <div id="mensagem_exclusao"></div>
+
+     <script>
+
+         const userIdToDeleteInput = document.getElementById('userIdToDelete');
+        const botaoDeletar = document.getElementById('botaoDeletar');
+        const mensagemDivExclusao = document.getElementById('mensagem_exclusao');
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const idDoUsuarioParaDeletar = urlParams.get('id');
+
+        if (idDoUsuarioParaDeletar) {
+            userIdToDeleteInput.value = idDoUsuarioParaDeletar;
+        } else {
+            mensagemDivExclusao.textContent = 'ID do usuário não especificado na URL. Não é possível excluir.';
+            mensagemDivExclusao.style.color = 'red';
+            botaoDeletar.disabled = true;
+        }
+
+        botaoDeletar.addEventListener('click', async function() {
+            const id = userIdToDeleteInput.value;
+
+            if (!id) {
+                mensagemDivExclusao.textContent = 'ID do usuário não disponível para exclusão.';
+                mensagemDivExclusao.style.color = 'red';
+                return;
+            }
+
+            const finalConfirm = confirm('Tem certeza de que deseja excluir sua conta?');
+            if (!finalConfirm) {
+                mensagemDivExclusao.textContent = 'Exclusão cancelada.';
+                mensagemDivExclusao.style.color = 'orange';
+                return;
+            }
+
+            mensagemDivExclusao.textContent = 'Excluindo conta...';
+            mensagemDivExclusao.style.color = 'blue';
+
+
+            try {
+                const response = await fetch(`http://localhost:3000/usuarios/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    mensagemDivExclusao.textContent = result.message;
+                    mensagemDivExclusao.style.color = 'green';
+                    localStorage.removeItem('usuarioId');
+                    window.location.href = 'login.html'; 
+                } else {
+                    mensagemDivExclusao.textContent = `Erro ao excluir: ${result.message || 'Ocorreu um erro desconhecido ao excluir.'}`;
+                    mensagemDivExclusao.style.color = 'red';
+                    console.error('Erro do servidor:', result.error);
+                }
+            } catch (error) {
+                console.error('Erro de rede ou na requisição de exclusão:', error);
+                mensagemDivExclusao.textContent = 'Não foi possível conectar ao servidor para excluir a conta. Verifique se o back-end está rodando.';
+                mensagemDivExclusao.style.color = 'red';
+            }
+        });
+
+
+
+     </script>
+
+
+
+</body>
+</html>

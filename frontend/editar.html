@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
+    <title>Perfil de Usuário</title>
+</head>
+<body>
+    
+ <header>
+        <h1 id=titulo >Editar dados do usuário</h1>
+    </header>
+
+     <form id="editarUsuarioForm" enctype="multipart/form-data">
+         <input type="hidden" id="userId" name="id">
+
+        <label for="edit_nome_completo"> <h2 id="subtitulo2" class="nome">Nome completo</h2></label><br>
+    <input type="text" id="edit_nome_completo" name="nome_completo" class="nome" placeholder="Altere seu nome completo" required><br>
+
+
+    <label for="edit_idade"><h2 id="subtitulo2" class="idade">Idade</h2></label><br>
+    <input type="number" id="edit_idade" name="idade" class="idade" placeholder="Altere sua idade" required><br>
+
+    <h2 id="subtitulo2">Endereço</h2>
+   
+    <label for="edit_rua"> <h3 id="subtitulo2" class="rua">Rua</h3></label><br>
+    <input type="text" id="edit_rua" name="rua" class="rua" placeholder="Altere sua rua" required><br>
+   
+   <label for="edit_bairro"> <h3 id="subtitulo2" class="bairro">Bairro</h3></label><br>
+    <input type="text" id="edit_bairro" name="bairro" class="bairro" placeholder="Altere seu bairro" required><br>
+    
+    <h3 id="subtitulo2" class="estado">Estado</h3>
+    <select id="edit_estado" name="estado" class="estado" required>
+        <option value="AC">AC</option>
+        <option value="AL">AL</option>
+        <option value="AP">AP</option>
+        <option value="AM">AM</option>
+        <option value="BA">BA</option>
+        <option value="CE">CE</option>
+        <option value="DF">DF</option>
+        <option value="ES">ES</option>
+        <option value="GO">GO</option>
+        <option value="MA">MA</option>
+        <option value="MT">MT</option>
+        <option value="MS">MS</option>
+        <option value="MG">MG</option>
+        <option value="PA">PA</option>
+        <option value="PB">PB</option>
+        <option value="PR">PR</option>
+        <option value="PE">PE</option>
+        <option value="PI">PI</option>
+        <option value="RJ">RJ</option>
+        <option value="RN">RN</option>
+        <option value="RS">RS</option>
+        <option value="RO">RO</option>
+        <option value="RR">RR</option>
+        <option value="SC">SC</option>
+        <option value="SP">SP</option>
+        <option value="SE">SE</option>
+        <option value="TO">TO</option>
+    </select>
+   <br>
+
+    
+    <label for="edit_biografia"><h3 id="subtitulo2">Biografia</h3></label><br>
+    <textarea id="edit_biografia" name="biografia" class="biografia" placeholder="Altere sua biografia..."></textarea><br>
+
+    <label for="foto_perfil_input_edit"><h3 id="subtitulo2" class="foto">Foto de perfil</h3></label><br>
+    <input type="file" id="foto_perfil_input_edit" name="foto_perfil_file" accept="image/*"><br>
+
+    <br>
+
+    <button type="submit" class="editar">Salvar alterações</button><br><br>
+    </form>
+
+    <a href="perfil.html">Página inicial</a>
+
+    <div id="mensagem_edicao"></div>
+
+    
+    <script>
+       const userIdInput = document.getElementById('userId');
+       const editForm = document.getElementById('editarUsuarioForm');
+       const mensagemDivEdicao = document.getElementById('mensagem_edicao');
+
+       async function carregarDadosUsuario(id) {
+           try {
+               const response = await fetch(`http://localhost:3000/usuarios/${id}`);
+               const userData = await response.json();
+
+               if (response.ok) {
+                   userIdInput.value = userData.id;
+
+                   document.getElementById('edit_nome_completo').value = userData.nome_completo;
+                   document.getElementById('edit_idade').value = userData.idade;
+                   document.getElementById('edit_rua').value = userData.rua;
+                   document.getElementById('edit_bairro').value = userData.bairro;
+                   document.getElementById('edit_estado').value = userData.estado;
+                   document.getElementById('edit_biografia').value = userData.biografia || '';
+
+               } else {
+                   mensagemDivEdicao.textContent = `Erro ao carregar usuário: ${userData.message || 'Desconhecido'}`;
+                   mensagemDivEdicao.style.color = 'red';
+               }
+           } catch (error) {
+               console.error('Erro de rede ao carregar usuário:', error);
+               mensagemDivEdicao.textContent = 'Não foi possível carregar os dados do usuário. Verifique a conexão com o servidor.';
+               mensagemDivEdicao.style.color = 'red';
+           }
+       }
+
+
+       const urlParams = new URLSearchParams(window.location.search);
+       const idDoUsuarioParaEditar = urlParams.get('id');
+
+       if (idDoUsuarioParaEditar) {
+           carregarDadosUsuario(idDoUsuarioParaEditar);
+       } else {
+           mensagemDivEdicao.textContent = 'ID do usuário não especificado na URL. Não é possível editar.';
+           mensagemDivEdicao.style.color = 'red';
+       }
+
+       editForm.addEventListener('submit', async function(event) {
+           event.preventDefault();
+
+           const id = userIdInput.value; 
+           const formData = new FormData(this); 
+
+           mensagemDivEdicao.textContent = 'Salvando alterações...';
+           mensagemDivEdicao.style.color = 'blue';
+
+           try {
+               const response = await fetch(`http://localhost:3000/usuarios/${id}`, {
+                   method: 'PUT',
+                   body: formData
+               });
+
+               const result = await response.json();
+
+               if (response.ok) {
+                   mensagemDivEdicao.textContent = result.message;
+                   mensagemDivEdicao.style.color = 'green';
+                   localStorage.setItem('usuarioId', id);
+                   window.location.href = 'perfil.html';
+
+               } else {
+                   mensagemDivEdicao.textContent = `Erro: ${result.message || 'Ocorreu um erro desconhecido ao salvar.'}`;
+                   mensagemDivEdicao.style.color = 'red';
+                   console.error('Erro do servidor:', result.error);
+               }
+
+           } catch (error) {
+               console.error('Erro de rede ou na requisição de edição:', error);
+               mensagemDivEdicao.textContent = 'Não foi possível conectar ao servidor para salvar as alterações. Verifique se o back-end está rodando.';
+               mensagemDivEdicao.style.color = 'red';
+           }
+       });
+       </script>
+       
+</body>
+</html>

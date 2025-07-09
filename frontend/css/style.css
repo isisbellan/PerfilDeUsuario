@@ -1,0 +1,120 @@
+
+body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #4682B4;
+            margin: 0;
+            padding-top: 20px;
+            color: white;
+        }
+
+
+h1#subtitulo2 {
+            color: white;
+            margin-bottom: 30px;
+        }
+#estado { 
+    max-height: 150px;
+}
+
+
+#foto_perfil_file {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+}
+
+.profile-container {
+    background-color: #4682B4; 
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 600px; 
+    width: 90%;
+}
+
+.profile-info p {
+    margin: 8px 0;
+    font-size: 1.1em;
+    
+}
+
+#nomeCompleto {
+    color: black;
+}
+
+#idade {
+    color:black;
+}
+
+#endereco {
+    color:black;
+}
+
+#estado {
+    color:black;
+}
+
+#biografia {
+    color:black;
+}
+
+#editarhtml {
+             width: 100%;
+            text-align: center;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: transparent; 
+            color: white; 
+            border: 1px solid white;
+            transition: background-color 0.3s ease;
+
+}
+
+#deletarhtml {
+             width: 100%;
+            text-align: center;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: transparent;
+            color: red;
+            border: 1px solid white;
+            transition: background-color 0.3s ease;
+
+}
+
+#botaoLogOut {
+             width: 100%;
+            text-align: center;
+            margin-top: 15px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: transparent;
+            color: white;
+            border: 1px solid white;
+            transition: background-color 0.3s ease;
+
+}
+
+#espacobotoes {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+    margin: 30px auto 15px auto;
+}
